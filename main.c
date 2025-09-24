@@ -1,72 +1,84 @@
 #include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 #define MAX 100
 int top = -1;
-int stack[MAX];
+char stack[MAX];
+char infix[MAX], postfix[MAX];
 
-void push(int x){
-    if(top == MAX -1){
-        printf("stack overflow\n");
+void push(char x){
+    if(top == MAX-1){
+        printf("Overflow!!\n");
     } else {
         top++;
         stack[top] = x;
     }
 }
 
-void pop(){
+char pop(){
     if(top == -1){
-        printf("stack is empty");
+        printf("Underflow!!\n");
+        return '\0';
     } else {
-        top--;
+        return stack[top--];
     }
 }
-
-void peek(){
+int isEmpty(){
     if(top == -1){
-        printf("stack is empty");
-
+        return 1;
     } else {
-        printf("%d ", stack[top]);
+        return 0;
     }
 }
-
-void display(){
-    if(top == -1){
-        printf("Empty stack");
-    } else {
-        printf("\n");
-        for(int i =top ; i>=0; i--){
-            printf("%d ", stack[i]);
-        } printf("\n");
+int precedence(char symbol){
+    switch(symbol){
+        case '^':
+            return 3;
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+            return 1;
+        default:
+            return 0;
     }
+}
+void inToPost(){
+    char symbol, next;
+    int j=0;
+    for(int i=0; i<strlen(infix); i++){
+        symbol = infix[i];
+        switch(symbol){
+            case '(':
+                push(symbol);
+                break;
+            case ')':
+                while((next=pop()) != '(')
+                    postfix[j++] = next;
+                break;
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '^':
+                while(!isEmpty() && precedence(stack[top]) >= precedence(symbol)){
+                    postfix[j++] = pop();}
+                    push(symbol);
+                    break;
+            default:
+                postfix[j++] = symbol;
+                
+        }
+    } while(!isEmpty()){
+        postfix[j++] = pop();
+
+    } postfix[j] = '\0';
+    printf("Postfix expression: %s\n", postfix);
 }
 
 int main(){
-    int choice, x;
-    while(1){
-        printf("\nStack Menu\n");
-        printf("1. push\n");
-        printf("2. pop\n");
-        printf("3. peek\n");
-        printf("4. display\n");
-        printf("5. exit\n");
-        printf("Enter choice: ");
-        if(scanf("%d", &choice) != 1) return 0;
-
-        if(choice == 1){
-            printf("Enter value: ");
-            if(scanf("%d", &x) != 1) return 0;
-            push(x);
-        } else if(choice == 2){
-            pop();
-        } else if(choice == 3){
-            peek();
-        } else if(choice == 4){
-            display();
-        } else if(choice == 5){
-            break;
-        } else {
-            printf("Invalid choice\n");
-        }
-    }
-    return 0;
+    printf("Enter the infix expression: ");
+    gets(infix);
+    inToPost();
 }
