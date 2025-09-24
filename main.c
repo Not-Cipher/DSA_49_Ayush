@@ -1,84 +1,86 @@
 #include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#define MAX 100
-int top = -1;
-char stack[MAX];
-char infix[MAX], postfix[MAX];
 
-void push(char x){
-    if(top == MAX-1){
-        printf("Overflow!!\n");
+int front = -1, rear = -1;
+int queue[5];
+
+void enqueue(int x){
+    if(front == -1 && rear == -1){
+        front = 0; rear = 0;
+        queue[rear] = x;
+    } else if(rear == 4){
+        printf("queue overflow\n");
     } else {
-        top++;
-        stack[top] = x;
+        rear++;
+        queue[rear] = x;
     }
 }
 
-char pop(){
-    if(top == -1){
-        printf("Underflow!!\n");
-        return '\0';
+void dequeue(){
+    if(front == -1 && rear == -1){
+        printf("queue is empty\n");
+    } else if(front == rear){
+        front = -1; rear = -1;
     } else {
-        return stack[top--];
+        front++;
     }
 }
-int isEmpty(){
-    if(top == -1){
-        return 1;
+
+void getfront(){
+    if(front == -1 && rear == -1){
+        printf("queue is empty\n");
     } else {
-        return 0;
+        printf("Front element: %d\n", queue[front]);
     }
 }
-int precedence(char symbol){
-    switch(symbol){
-        case '^':
-            return 3;
-        case '*':
-        case '/':
-            return 2;
-        case '+':
-        case '-':
-            return 1;
-        default:
-            return 0;
+
+void getrear(){
+    if(front == -1 && rear == -1){
+        printf("queue is empty\n");
+    } else {
+        printf("Rear element: %d\n", queue[rear]);
     }
 }
-void inToPost(){
-    char symbol, next;
-    int j=0;
-    for(int i=0; i<strlen(infix); i++){
-        symbol = infix[i];
-        switch(symbol){
-            case '(':
-                push(symbol);
-                break;
-            case ')':
-                while((next=pop()) != '(')
-                    postfix[j++] = next;
-                break;
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case '^':
-                while(!isEmpty() && precedence(stack[top]) >= precedence(symbol)){
-                    postfix[j++] = pop();}
-                    push(symbol);
-                    break;
-            default:
-                postfix[j++] = symbol;
-                
+
+void display(){
+    if(front == -1 && rear == -1){
+        printf("queue is empty\n");
+    } else {
+        printf("Queue: ");
+        for(int i=front; i<=rear; i++){
+            printf("%d ", queue[i]);
         }
-    } while(!isEmpty()){
-        postfix[j++] = pop();
-
-    } postfix[j] = '\0';
-    printf("Postfix expression: %s\n", postfix);
+        printf("\n");
+    }
 }
 
 int main(){
-    printf("Enter the infix expression: ");
-    gets(infix);
-    inToPost();
+    int choice, x;
+    while(1){
+        printf("\n1. enqueue\n2. dequeue\n3. get front\n4. get rear\n5. display\n6. exit\n");
+        printf("Enter choice: ");
+        if(scanf("%d", &choice) != 1) return 0;
+        switch(choice){
+            case 1:
+                printf("Enter value: ");
+                if(scanf("%d", &x) != 1) return 0;
+                enqueue(x);
+                break;
+            case 2:
+                dequeue();
+                break;
+            case 3:
+                getfront();
+                break;
+            case 4:
+                getrear();
+                break;
+            case 5:
+                display();
+                break;
+            case 6:
+                return 0;
+            default:
+                printf("Invalid choice\n");
+        }
+    }
 }
